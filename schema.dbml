@@ -1,0 +1,62 @@
+// WorkLog Payment Dashboard — Database Schema
+// Generated for GenieX Fullstack Assessment
+
+Table user {
+  id         uuid [primary key]
+  email      varchar(255) [unique, not null]
+  full_name  varchar(255)
+  is_active  boolean [default: true]
+  is_superuser boolean [default: false]
+  hashed_password varchar [not null]
+
+  indexes {
+    email
+  }
+}
+
+Table remittance {
+  id           uuid [primary key]
+  user_id      uuid [not null, ref: > user.id]
+  amount       float [not null, note: "Sum of all active time entry amounts for this billing period"]
+  status       varchar(50) [not null, default: "COMPLETED", note: "COMPLETED | FAILED | CANCELLED"]
+  period_start timestamp [not null]
+  period_end   timestamp [not null]
+  created_at   timestamp [not null]
+
+  indexes {
+    user_id
+    status
+    created_at
+  }
+}
+
+Table worklog {
+  id             uuid [primary key]
+  task_name      varchar(255) [not null]
+  user_id        uuid [not null, ref: > user.id]
+  status         varchar(50) [not null, default: "UNREMITTED", note: "UNREMITTED | REMITTED"]
+  created_at     timestamp [not null]
+  remittance_id  uuid [ref: > remittance.id, note: "NULL until paid"]
+
+  indexes {
+    user_id
+    status
+    created_at
+    remittance_id
+  }
+}
+
+Table time_entry {
+  id           uuid [primary key]
+  worklog_id   uuid [not null, ref: > worklog.id]
+  description  varchar(512) [not null]
+  hours        float [not null]
+  hourly_rate  float [not null]
+  recorded_at  timestamp [not null]
+  is_active    boolean [not null, default: true, note: "false = deducted/disputed segment"]
+
+  indexes {
+    worklog_id
+    recorded_at
+  }
+}

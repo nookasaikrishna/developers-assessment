@@ -1,0 +1,215 @@
+{
+  "GET /api/v1/list-all-worklogs": {
+    "description": "List all worklogs with computed earnings per task. Supports optional query params: startDate, endDate, remittanceStatus (REMITTED | UNREMITTED).",
+    "request": {
+      "method": "GET",
+      "url": "http://localhost:8000/api/v1/list-all-worklogs?remittanceStatus=UNREMITTED",
+      "headers": {
+        "Authorization": "Bearer <token>"
+      }
+    },
+    "response": {
+      "status": 200,
+      "body": {
+        "data": [
+          {
+            "id": "3f2a1b4c-0001-0000-0000-000000000001",
+            "task_name": "Homepage Redesign",
+            "user_id": "aabb1122-0000-0000-0000-000000000001",
+            "status": "UNREMITTED",
+            "created_at": "2026-02-05T09:14:00.000000",
+            "remittance_id": null,
+            "total_earnings": 1062.5,
+            "freelancer_name": "Alice Johnson",
+            "freelancer_email": "alice@freelance.dev"
+          },
+          {
+            "id": "3f2a1b4c-0001-0000-0000-000000000002",
+            "task_name": "Mobile App Navigation",
+            "user_id": "aabb1122-0000-0000-0000-000000000002",
+            "status": "UNREMITTED",
+            "created_at": "2026-02-08T11:00:00.000000",
+            "remittance_id": null,
+            "total_earnings": 855.0,
+            "freelancer_name": "Bob Martinez",
+            "freelancer_email": "bob@freelance.dev"
+          },
+          {
+            "id": "3f2a1b4c-0001-0000-0000-000000000003",
+            "task_name": "Database Schema Migration",
+            "user_id": "aabb1122-0000-0000-0000-000000000003",
+            "status": "UNREMITTED",
+            "created_at": "2026-02-02T08:00:00.000000",
+            "remittance_id": null,
+            "total_earnings": 807.5,
+            "freelancer_name": "Carol White",
+            "freelancer_email": "carol@freelance.dev"
+          }
+        ],
+        "count": 3
+      }
+    }
+  },
+
+  "GET /api/v1/worklogs/{id}": {
+    "description": "Retrieve a single worklog with all its individual time entries.",
+    "request": {
+      "method": "GET",
+      "url": "http://localhost:8000/api/v1/worklogs/3f2a1b4c-0001-0000-0000-000000000001",
+      "headers": {
+        "Authorization": "Bearer <token>"
+      }
+    },
+    "response": {
+      "status": 200,
+      "body": {
+        "id": "3f2a1b4c-0001-0000-0000-000000000001",
+        "task_name": "Homepage Redesign",
+        "user_id": "aabb1122-0000-0000-0000-000000000001",
+        "status": "UNREMITTED",
+        "created_at": "2026-02-05T09:14:00.000000",
+        "remittance_id": null,
+        "total_earnings": 1062.5,
+        "freelancer_name": "Alice Johnson",
+        "freelancer_email": "alice@freelance.dev",
+        "time_entries": [
+          {
+            "id": "ee001122-0000-0000-0000-000000000001",
+            "worklog_id": "3f2a1b4c-0001-0000-0000-000000000001",
+            "description": "Initial wireframes",
+            "hours": 3.0,
+            "hourly_rate": 85.0,
+            "recorded_at": "2026-02-05T10:00:00.000000",
+            "is_active": true,
+            "amount": 255.0
+          },
+          {
+            "id": "ee001122-0000-0000-0000-000000000002",
+            "worklog_id": "3f2a1b4c-0001-0000-0000-000000000001",
+            "description": "Figma mockups",
+            "hours": 5.0,
+            "hourly_rate": 85.0,
+            "recorded_at": "2026-02-05T10:00:00.000000",
+            "is_active": true,
+            "amount": 425.0
+          },
+          {
+            "id": "ee001122-0000-0000-0000-000000000003",
+            "worklog_id": "3f2a1b4c-0001-0000-0000-000000000001",
+            "description": "CSS implementation",
+            "hours": 4.5,
+            "hourly_rate": 85.0,
+            "recorded_at": "2026-02-05T10:00:00.000000",
+            "is_active": true,
+            "amount": 382.5
+          }
+        ]
+      }
+    }
+  },
+
+  "POST /api/v1/generate-remittances-for-all-users": {
+    "description": "Generate remittances for a selected set of worklogs. Groups by freelancer and creates one Remittance record per user.",
+    "request": {
+      "method": "POST",
+      "url": "http://localhost:8000/api/v1/generate-remittances-for-all-users",
+      "headers": {
+        "Authorization": "Bearer <token>",
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "worklog_ids": [
+          "3f2a1b4c-0001-0000-0000-000000000001",
+          "3f2a1b4c-0001-0000-0000-000000000002",
+          "3f2a1b4c-0001-0000-0000-000000000003"
+        ],
+        "period_start": "2026-02-01T00:00:00.000000Z",
+        "period_end": "2026-02-28T23:59:59.000000Z"
+      }
+    },
+    "response": {
+      "status": 201,
+      "body": [
+        {
+          "id": "cc991100-0000-0000-0000-000000000001",
+          "user_id": "aabb1122-0000-0000-0000-000000000001",
+          "amount": 1062.5,
+          "status": "COMPLETED",
+          "period_start": "2026-02-01T00:00:00.000000",
+          "period_end": "2026-02-28T23:59:59.000000",
+          "created_at": "2026-03-02T10:30:00.000000",
+          "worklog_count": 1,
+          "freelancer_name": "Alice Johnson",
+          "freelancer_email": "alice@freelance.dev"
+        },
+        {
+          "id": "cc991100-0000-0000-0000-000000000002",
+          "user_id": "aabb1122-0000-0000-0000-000000000002",
+          "amount": 855.0,
+          "status": "COMPLETED",
+          "period_start": "2026-02-01T00:00:00.000000",
+          "period_end": "2026-02-28T23:59:59.000000",
+          "created_at": "2026-03-02T10:30:00.000000",
+          "worklog_count": 1,
+          "freelancer_name": "Bob Martinez",
+          "freelancer_email": "bob@freelance.dev"
+        },
+        {
+          "id": "cc991100-0000-0000-0000-000000000003",
+          "user_id": "aabb1122-0000-0000-0000-000000000003",
+          "amount": 807.5,
+          "status": "COMPLETED",
+          "period_start": "2026-02-01T00:00:00.000000",
+          "period_end": "2026-02-28T23:59:59.000000",
+          "created_at": "2026-03-02T10:30:00.000000",
+          "worklog_count": 1,
+          "freelancer_name": "Carol White",
+          "freelancer_email": "carol@freelance.dev"
+        }
+      ]
+    }
+  },
+
+  "GET /api/v1/remittances": {
+    "description": "List all remittances with freelancer info and the number of worklogs covered.",
+    "request": {
+      "method": "GET",
+      "url": "http://localhost:8000/api/v1/remittances",
+      "headers": {
+        "Authorization": "Bearer <token>"
+      }
+    },
+    "response": {
+      "status": 200,
+      "body": {
+        "data": [
+          {
+            "id": "cc991100-0000-0000-0000-000000000001",
+            "user_id": "aabb1122-0000-0000-0000-000000000001",
+            "amount": 1062.5,
+            "status": "COMPLETED",
+            "period_start": "2026-02-01T00:00:00.000000",
+            "period_end": "2026-02-28T23:59:59.000000",
+            "created_at": "2026-03-02T10:30:00.000000",
+            "worklog_count": 1,
+            "freelancer_name": "Alice Johnson",
+            "freelancer_email": "alice@freelance.dev"
+          },
+          {
+            "id": "cc991100-0000-0000-0000-000000000002",
+            "user_id": "aabb1122-0000-0000-0000-000000000002",
+            "amount": 855.0,
+            "status": "COMPLETED",
+            "period_start": "2026-02-01T00:00:00.000000",
+            "period_end": "2026-02-28T23:59:59.000000",
+            "created_at": "2026-03-02T10:30:00.000000",
+            "worklog_count": 1,
+            "freelancer_name": "Bob Martinez",
+            "freelancer_email": "bob@freelance.dev"
+          }
+        ],
+        "count": 2
+      }
+    }
+  }
+}
